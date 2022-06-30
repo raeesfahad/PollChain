@@ -15,4 +15,9 @@ Usage
 4- Go to localhost:8000/ to load homepage in browser or localhost:8000/docs to test api docs
 
 
+Dependencies : 
+
+You need MongoDB to be installed on your system
+
+
 
