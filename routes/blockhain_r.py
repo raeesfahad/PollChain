@@ -91,3 +91,10 @@ def display_stats():
 def keys():
 
     return helper.generate_keys()
+
+
+@router.get('/check_votes/{candidate}')
+def Votes(candidate):
+    votes = getter.get_single_candidates_votes(candidate)
+
+    return {"votes" : votes }
