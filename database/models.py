@@ -1,6 +1,5 @@
 from datetime import datetime
-import string
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from odmantic import EmbeddedModel, Field, Model
 
@@ -16,8 +15,9 @@ class Voter(Model):
     cnic : str
     name : str
     address : str
-    isValid : bool = False
     has_voted : bool = False
+    public_key : Optional[str]
+    private_key : Optional[str]
 
 class User(Model):
     picture : str

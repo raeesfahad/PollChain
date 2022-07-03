@@ -44,6 +44,3 @@ class Utils:
         return {"public_key" : public_key, "private_key" : private_key}
         
 
-    def parse(obj):
-        return dataclass_wizard.asdict(obj)
-

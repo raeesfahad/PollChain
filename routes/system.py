@@ -1,4 +1,4 @@
-from api import schema
+from api.schema import Verification
 from repositories.utils import Utils as helper
 from database import connector
 from database.models import Candydate, Voter
@@ -7,7 +7,7 @@ from faker import Faker
 from api.hashing import Hash
 from repositories.security import manager
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status, Response
 
 router = APIRouter(
     prefix= '/api/system',
@@ -43,3 +43,43 @@ async def get_all():
 
     x_candidate = await db.get_candidates()
     return x_candidate
+
+@router.post('/insert_voter')
+async def insert_one_voter(request:Voter):
+
+    object = await db.insert(Voter(cnic=request.cnic, public_key=request.public_key, name=request.name, address = request.address , isValid = False, has_voted = False ))
+    return request
+
+@router.post('/verify_voter', status_code=status.HTTP_200_OK)
+async def verify_voter(request:Verification, response : Response):
+
+    if (not request.private_key) or (request.cnic):
+        data = await db.get_one(Voter, Voter.cnic == request.cnic)
+        key_pair = helper.generate_keys()
+        data.update(key_pair)
+        await db.insert(data)
+        response.status_code = status.HTTP_201_CREATED
+        return {"message" : "You can now vote with your private key", "key_pair" : key_pair}
+    
+    if (not request.private_key) or (request.cnic):
+        
+        data = await db.get_one(Voter, Voter.private_key == request.private_key)
+        
+        if not data.has_voted:
+            response.status_code = status.HTTP_204_NO_CONTENT
+            return {"message" : "you have already voted"}
+        
+        response.status_code = status.HTTP_202_ACCEPTED
+        return {"message" : "You are ready to vote"}
+    
+    if not request.cnic and request.private_key:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"message" : "You are not eligible for voting"}
+
+
+        
+
+
+
+
+

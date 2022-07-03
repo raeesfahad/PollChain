@@ -94,9 +94,11 @@ async def get_candidates():
 
     return candidate
 
-async def Validator(instance,id):
+async def Validator(instance,public_key,cnic):
 
-    param = await database.find(Instance, Voter.id == id)
+    if public_key == null and cnic:
+        
+        param = await database.find(Instance, Voter.public_key == public_key)
 
     if not param.has_voted and param.isValid:
         return {"Message" : "You Have Already Voted"}
