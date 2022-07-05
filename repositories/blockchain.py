@@ -11,19 +11,16 @@ class BlockChain:
 
     def __init__(self):
         self.chain = []
-        self.create_block(proof=1, previous_block='0',
-                       public_key = None, candidate_name=None, candidate_party=None, seat=None)
+        self.create_block(proof=1, previous_block='0', candidate_name=None, candidate_party=None, seat=None)
 
-    def create_block(self, proof, previous_block, public_key, candidate_name, candidate_party, seat):
+    def create_block(self, proof, previous_block, candidate_name, candidate_party, seat):
 
         block = {'index': len(self.chain) + 1,
                  'timestamp': str(datetime.now()),
                  'proof': proof,
                  'previous_hash': previous_block,
                  'vote' : {
-                   "public_key" : public_key,
                    "candidate"  : {
-                    
                     "name" : candidate_name,
                     "party" : candidate_party,
                      "seat" : seat

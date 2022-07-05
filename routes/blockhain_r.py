@@ -36,7 +36,7 @@ async def poll(request:Vote):
         previous_proof = previous_block['proof']
         proof = pollchain.proof_of_work(previous_proof)
         previous_hash = pollchain.hash(previous_block)
-        block = pollchain.create_block(proof, previous_hash, request.public_key, request.candidate.name, request.candidate.party, request.candidate.seat)
+        block = pollchain.create_block(proof, previous_hash, request.candidate.name, request.candidate.party, request.candidate.seat)
 
         response = {'message': 'Polling Success',
 				'index': block['index'],

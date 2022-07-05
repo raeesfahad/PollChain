@@ -1,8 +1,10 @@
 import string
 import random
-from cryptography.hazmat.primitives import serialization as crypto_serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.backends import default_backend as crypto_default_backend
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives import serialization
+
 
 
 
@@ -24,23 +26,13 @@ class Utils:
         return proccesed_digits
     
     def generate_keys():
-        key = rsa.generate_private_key(
-        backend=crypto_default_backend(),
-        public_exponent=65537,
-        key_size=512
-         )
+        key = ec.generate_private_key(
+        ec.SECP256K1(), default_backend())
 
-        private_key = key.private_bytes(
-        crypto_serialization.Encoding.PEM,
-        crypto_serialization.PrivateFormat.PKCS8,
-        crypto_serialization.NoEncryption()
-        )
 
-        public_key = key.public_key().public_bytes(
-        crypto_serialization.Encoding.OpenSSH,
-        crypto_serialization.PublicFormat.OpenSSH
-        )
+        private_key = format(key.private_numbers().private_value, '064x')
+        
 
-        return {"public_key" : public_key, "private_key" : private_key}
+        return {"message" : "your private is generated",  "private_key" : private_key}
         
 

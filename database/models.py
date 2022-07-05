@@ -16,7 +16,6 @@ class Voter(Model):
     name : str
     address : str
     has_voted : bool = False
-    public_key : Optional[str]
     private_key : Optional[str]
 
 class User(Model):
