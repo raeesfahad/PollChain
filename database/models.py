@@ -25,7 +25,6 @@ class User(Model):
     password : str
 
 class Vote(Model):
-    public_key : str
     candidate : Candidate
 
 class Chain(Model):

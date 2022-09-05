@@ -49,18 +49,18 @@ async def poll(request:Vote):
         getter.get_vote_from_block(request)
         rev_chain = Chain(instance=pollchain.chain)
         await insert(rev_chain)
-        return {"message" : f"You polled a vote for {request.candidate.name}"}
+        return {"message" : f"You polled a vote for {request.candidate.name}", "response" : response}
 
 
 
 @router.get('/validate_chain')
-def valid():
+async def valid():
     valid = pollchain.chain_valid(pollchain.chain)
      
     if valid:
-        response = {'message': 'Proccess Integrity confirmed.'}
+        response = {'message': 'Proccess Integrity confirmed.', "state" : True}
     else:
-        response = {'message': 'The Blockchain is not valid.'}
+        response = {'message': 'The Blockchain is not valid.' , "state" : False}
     
     return response
 	
