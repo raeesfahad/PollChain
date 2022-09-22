@@ -1,8 +1,8 @@
-from bson import ObjectId
+from odmantic import ObjectId
 from odmantic import AIOEngine
 
 
-from database.models import Candydate, User, Voter
+from database.models import Candydate, User, Voter, Chain
 
 database = AIOEngine(database="Election_DB")
 
@@ -104,3 +104,16 @@ async def Validator(instance,public_key,cnic):
         return {"Message" : "You Have Already Voted"}
     else:
         return True
+
+async def get_single_candidate(id): 
+
+  uuid = ObjectId(id)
+
+  candidate = await database.find_one(Candydate, Candydate.id == uuid)
+  return candidate
+
+
+async def get_db_chain():
+    
+    chain = await database.find_one(Chain)
+    return chain

@@ -2,7 +2,7 @@ from datetime import datetime
 import hashlib
 import json
 from collections import Counter
-from database.connector import insert
+
 
 
 class BlockChain:
@@ -13,10 +13,11 @@ class BlockChain:
         self.chain = []
         self.create_block(proof=1, previous_block='0', candidate_name=None, candidate_party=None, seat=None)
 
+
     def create_block(self, proof, previous_block, candidate_name, candidate_party, seat):
 
         block = {'index': len(self.chain) + 1,
-                 'timestamp': str(datetime.now()),
+                 'timestamp': str(datetime.now().strftime("%d-%m-%Y %H:%M")),
                  'proof': proof,
                  'previous_hash': previous_block,
                  'vote' : {
@@ -73,6 +74,19 @@ class BlockChain:
                 block_index += 1
 
             return True
+    
+    def check_temper(self, list):
+
+        last_item = list
+        print(last_item)
+
+        
+        if last_item != self.chain:
+            return False
+        elif last_item == self.chain:
+            return True
+
+
 
 
         

@@ -6,7 +6,7 @@ from collections import Counter
 from api.schema import vote as ResponseVote
 from repositories.blockchain import BlockChain
 from repositories.calculators import Calculators
-from database.connector import CheckVoter, insert, database
+from database.connector import *
 from repositories.utils import Utils
 
 pollchain = BlockChain()
@@ -30,35 +30,41 @@ async def check_user_and_confirm(cnic):
 
 
 @router.post('/poll')
-async def poll(request:Vote):
+async def poll(id):
+
+        candidate = await get_single_candidate(id)
 
         previous_block = pollchain.previous_block()
         previous_proof = previous_block['proof']
         proof = pollchain.proof_of_work(previous_proof)
         previous_hash = pollchain.hash(previous_block)
-        block = pollchain.create_block(proof, previous_hash, request.candidate.name, request.candidate.party, request.candidate.seat)
-
-        response = {'message': 'Polling Success',
-				'index': block['index'],
-				'timestamp': block['timestamp'],
-				'proof': block['proof'],
-				'previous_hash': block['previous_hash'],
-                'vote' : block['vote']}
-
+        block = pollchain.create_block(proof, previous_hash, candidate.name, candidate.party, candidate.slogan)
+        vote = block['vote']
         
-        getter.get_vote_from_block(request)
+        response = {"timestamp" : block['timestamp'],
+                "previous_hash" : block['previous_hash'],
+                "candidate" : f"{vote['candidate']['name']} of {vote['candidate']['party']}",
+
+        }
+
+        getter.get_vote_from_block(vote['candidate'])
+        getter.get_party_from_block(vote['candidate'])
         rev_chain = Chain(instance=pollchain.chain)
         await insert(rev_chain)
-        return {"message" : f"You polled a vote for {request.candidate.name}", "response" : response}
+      
+        return response
 
 
 
 @router.get('/validate_chain')
 async def valid():
+
     valid = pollchain.chain_valid(pollchain.chain)
+
+
      
     if valid:
-        response = {'message': 'Proccess Integrity confirmed.', "state" : True}
+        response = {'message': 'Proccess Integrity confirmed.',"chain" : True}
     else:
         response = {'message': 'The Blockchain is not valid.' , "state" : False}
     
@@ -77,13 +83,21 @@ async def display_chain():
 
 @router.get('/stats')
 def display_stats():
+
+    print(f"candidate : {getter.candidates}")
+    print(f"parties : {getter.parties}")
+    
     
     results = Counter(getter.candidates)
 
+
+            
+
     response = { 'total_votes' : len(pollchain.chain)-1,
-                 'last_vote_polled_for' : getter.candidates[-1],
-                 'results' : results
-                }
+                   'last_vote_polled_for' : f"{getter.candidates[-1]} of {getter.parties[-1]}",
+
+                   'results' : results
+                  }
 
     return response
 
@@ -93,8 +107,12 @@ def keys():
     return helper.generate_keys()
 
 
-@router.get('/check_votes/{candidate}')
-def Votes(candidate):
-    votes = getter.get_single_candidates_votes(candidate)
 
-    return {"votes" : votes }
+
+@router.post('/get_candidates/{id}')
+async def Candidate(id):
+
+    candidate = await get_single_candidate(id)
+    votes = getter.get_single_candidates_votes(candidate.name)
+
+    return { "candidate" : candidate, "votes" : votes}
